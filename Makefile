@@ -1,8 +1,19 @@
 
-boot.bin: boot.asm
-	nasm -f bin boot.asm -o boot.bin
+ASMC := nasm
+ASMFLAGS := -f bin
+QEMUC := qemu-system-x86_64
 
-run: boot.bin
-	qemu-system-x86_64 -drive format=raw,file=boot.bin
+build/%.bin: %.asm | build/
+	$(ASMC) $(ASMFLAGS) $< -o $@
 
+run: build/boot.bin
+	$(QEMUC) -drive format=raw,file=$<
+
+build/:
+	mkdir -p build
+
+clean:
+	rm -vrf build
+
+.PHONY: run clean
 
