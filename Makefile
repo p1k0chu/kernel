@@ -3,11 +3,32 @@ ASMC := nasm
 ASMFLAGS := -f bin
 QEMUC := qemu-system-x86_64
 
-build/boot.bin: build/first_boot.bin build/second_boot.bin
-	dd if=build/first_boot.bin of=$@  bs=512 conv=sync,notrunc
-	dd if=build/second_boot.bin of=$@ bs=512 seek=1 conv=sync,notrunc
+ARCH := i686-elf
+CC := $(ARCH)-gcc
+CFLAGS := -ffreestanding -m32 -nostdlib
 
-build/%.bin: %.asm | build/
+LD := $(ARCH)-ld
+LDFLAGS := -nostdlib
+
+OBJCOPY := $(ARCH)-objcopy
+
+build/boot.bin: build/first_boot.bin build/kernel.bin
+	dd if=build/first_boot.bin of=$@  bs=512 conv=sync,notrunc
+	dd if=build/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc
+
+build/kernel.bin: build/kernel.elf
+	$(OBJCOPY) -O binary $< $@
+
+build/kernel.elf: build/kernel.c.o build/kernel.asm.o
+	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
+
+build/kernel.c.o: kernel.c | build/
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/kernel.asm.o: kernel.asm | build/
+	$(ASMC) -f elf32 $< -o $@
+
+build/first_boot.bin: first_boot.asm | build/
 	$(ASMC) $(ASMFLAGS) $< -o $@
 
 run: build/boot.bin
