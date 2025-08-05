@@ -1,5 +1,5 @@
-#include "kernel_asm.h"
 #include "io.h"
+#include "kernel_asm.h"
 
 void kernel_main() {
     // read vga width
@@ -8,8 +8,11 @@ void kernel_main() {
 
     clear_vga();
 
-    print(0, 0, "RAHHHHHH\n"
-                "WHAT THE FUCK IS AN\n"
-                "OS?????\n", WHITE_FG);
+    print(0,
+          0,
+          "RAHHHHHH\n"
+          "WHAT THE FUCK IS AN\n"
+          "OS?????\n",
+          WHITE_FG);
 }
 
