@@ -8,11 +8,11 @@ start:
     xor ax, ax
     mov es, ax
 
-    ; Load 2 sectors at 0x8000
+    ; Load 1 sector at 0x8000
     mov ah, 0x02     ; BIOS read sector function
-    mov al, 1        ; Read 2 sectors
+    mov al, 1        ; Read 1 sector
     mov ch, 0        ; Cylinder 0
-    mov cl, 2        ; Sector 2 (boot sector is 1)
+    mov cl, 2        ; first sector will be 2
     mov dh, 0        ; Head 0
     mov dl, 0x80     ; First HDD
     ; Load address = 0x0000:0x8000
