@@ -6,51 +6,39 @@ org 0x8000
 %define NEW_LINE 0xA
 
 start:
-    ; fetch vga video mode
-    ; ah - number of columns
+    ; setup stack
+    mov ax, 0x7000
+    mov ss, ax
+    mov sp, 0xFFFE
+
+    ; fetch vga text mode width
     mov ah, 0x0F
     int 0x10
 
-    mov bl, ah
-    shl bx, 1 ; multiply by two 
-              ; because two bytes per character
+    mov dl, ah
+    shl dx, 1
+    mov [vga_width], dx
 
     ; setup segment override for vga text mode
     mov ax, 0xB800
     mov es, ax
-    xor di, di
 
-clear:
-    ; clear screen
-    mov ah, 0
-    mov al, SPACE
+    call clear
 
-    ; clear 25 rows
-    mov cx, bx
-    imul cx, 25
-
-.loop:
-    mov [es:di], ax
-    add di, 2
-
-    cmp di, cx
-    jb .loop
-
-message:
     xor di, di
     mov si, msg
+    call print
 
+hang:
+    cli
 .loop:
-    mov ah, 0b00001111 ; white on black
-    mov al, [si]
-    cmp al, 0
-    je hang
+    hlt
+    jmp .loop
 
-    cmp al, NEW_LINE
-    jne .print_char
-
-    ; newline
-    ; add the full vga text mode width
+newline:
+    ; di - index
+    ; return ax - new index
+    mov bx, [vga_width]
     add di, bx
 
     ; calculate remainder di/bx
@@ -59,26 +47,67 @@ message:
     mov cx, bx
     div cx
 
-    ; move back di to the start of the line
-    sub di, dx
+    mov ax, di
 
-    jmp .inc_char
+    ; move back to the start of the line
+    sub ax, dx
 
-.print_char:
-    mov [es:di], ax
-    add di, 2
+    ret
 
-.inc_char:
+; prints a string
+print:
+    ; di - the character index
+    ; si - pointer at the beginning of str
+    ; return ax - new character index
+    
+.loop:
+    mov al, [si]
+    cmp al, 0
+    je .ret
+
+    ; new line?
+    cmp al, NEW_LINE
+    jne .nn
+
+    ; new line.
+    call newline
+    mov di, ax
     inc si
     jmp .loop
 
-hang:
-    cli
-.loop:
-    hlt
+; no new line
+.nn:
+    mov ah, 0b00001111 ; white on black
+    mov [es:di], ax
+    add di, 2
+    inc si
     jmp .loop
+
+.ret:
+    mov ax, di
+    ret
+
+; clears the screen
+clear:
+    xor dx, dx
+    mov ax, [vga_width]
+    mov bx, 25
+    mul bx
+    mov cx, ax
+
+    mov ax, 0x20
+    xor di, di ; start from 0 character
+    rep stosw
+
+    ret
+
 
 msg db "I love maya <3", NEW_LINE
     db "she is the best girl ever <3", NEW_LINE
     db "shes my happiness :33", 0
+
+; global variable to store
+; vga text mode columns width (in bytes)
+; its double because 2 bytes per character
+vga_width dw 0
 
