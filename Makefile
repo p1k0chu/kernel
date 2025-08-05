@@ -3,6 +3,10 @@ ASMC := nasm
 ASMFLAGS := -f bin
 QEMUC := qemu-system-x86_64
 
+build/boot.bin: build/first_boot.bin build/second_boot.bin
+	dd if=build/first_boot.bin of=$@  bs=512 conv=notrunc
+	dd if=build/second_boot.bin of=$@ bs=512 seek=1 conv=notrunc
+
 build/%.bin: %.asm | build/
 	$(ASMC) $(ASMFLAGS) $< -o $@
 
