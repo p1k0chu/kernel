@@ -39,11 +39,6 @@ pmode_start:
     ; setup stack
     mov esp, stack_top
 
-    mov esi, 0xB8000
-    mov al, 0x41
-    mov ah, 0b00001111
-    mov [esi], ax
-
     call kernel_main
 
 hang:
@@ -80,10 +75,6 @@ inb:
     ret
 
 section .data
-
-empty_idt:
-    dw 0          ; limit=0 (invalid)
-    dd 0          ; base=0 (invalid)
 
 gdtr:
     dw gdt_end - gdt - 1
