@@ -3,7 +3,7 @@
 #include "kernel_asm.h"
 #include "vga_color.h"
 
-volatile short *const vga_mem   = (void *)0xB8000;
+volatile short *const vga_mem = (void *)0xB8000;
 char                  vga_width;
 
 int cursor_x = 0;
@@ -27,7 +27,7 @@ void putc_white(char c) {
     putc(c, WHITE_FG);
 }
 
-inline void println(const char* str, char attr) {
+inline void println(const char *str, char attr) {
     print(str, attr);
     cursor_x = 0;
     ++cursor_y;
