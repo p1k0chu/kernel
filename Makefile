@@ -26,9 +26,16 @@ ELF_ASM_OBJS := $(KERNEL_ASM_OBJS)
 BIN_ASM_SOURCES := first_boot.asm
 BIN_ASM_OBJS := $(patsubst %.asm,$(BUILD_DIR)/%.bin,$(BIN_ASM_SOURCES))
 
+define strip_build
+$(patsubst $(BUILD_DIR)/%,%,$1)
+endef
+
 $(BUILD_DIR)/boot.bin: $(BUILD_DIR)/first_boot.bin $(BUILD_DIR)/kernel.bin
-	dd if=$(BUILD_DIR)/first_boot.bin of=$@  bs=512 conv=sync,notrunc
-	dd if=$(BUILD_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc
+	$(info Combining $(call strip_build,$^) into $(call strip_build,$@)...)
+	@dd if=$(BUILD_DIR)/first_boot.bin of=$@  bs=512 conv=sync,notrunc 2> /dev/null
+	@dd if=$(BUILD_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc 2> /dev/null
+	@# just make sure the size in sectors is correct
+	$(info The size of $(call strip_build,$@) is $(shell expr $$(stat --printf %s $@) / 512) sectors)
 
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
@@ -46,14 +53,16 @@ $(BIN_ASM_OBJS): $(BUILD_DIR)/%.bin: %.asm | $(BUILD_DIR)/
 	$(ASMC) -f bin $< -o $@
 
 run: $(BUILD_DIR)/boot.bin
-	$(info Running qemu with $< image...)
-	@$(QEMUC) -drive format=raw,file=$<
+	$(QEMUC) -drive format=raw,file=$< 2> /dev/null
 
 $(BUILD_DIR)/:
-	mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -vrf $(BUILD_DIR)
+	@read -p "Run rm -vrf $(BUILD_DIR) ? [y/N] " ans; \
+	if [ "$$ans" = "y" ]; then \
+		rm -vrf $(BUILD_DIR); \
+	fi
 
 .PHONY: run clean
 
