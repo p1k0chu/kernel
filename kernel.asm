@@ -1,43 +1,31 @@
-; second stage boot loader
-
-bits 16
-
-section .start
-
-_start:
-    jmp start
-
-section .text
-
-extern kernel_main
-global start
-global inb
-global outb
-
-start:
-    cli
-    lgdt [gdtr]
-
-    ; set the protected mode bit
-    mov eax, cr0
-    or al, 1
-    mov cr0, eax
-
-    jmp 0x08:pmode_start
+; kernel asm side
 
 bits 32
 
-pmode_start:
-    ; set all segment registers to 0x10
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+section .start
+    global _start
 
+_start:
+    mov edi, 0xb8000
+    mov byte [edi], 'H'
+    add edi, 2
+    mov byte [edi], 'I'
+    add edi, 2
+    mov byte [edi], 'I'
+    add edi, 2
+    mov byte [edi], 'I'
+
+    jmp start
+
+section .text
+    extern kernel_main
+    global inb
+    global outb
+
+start:
     ; setup stack
     mov esp, stack_top
+    mov ebp, esp
 
     call kernel_main
 
@@ -73,18 +61,6 @@ inb:
 
     leave
     ret
-
-section .data
-
-gdtr:
-    dw gdt_end - gdt - 1
-    dd gdt
-
-gdt:
-    dq 0 ; null descriptor
-    dq 0x00CF9A000000FFFF ; Code segment descriptor
-    dq 0x00CF92000000FFFF ; Data segment descriptor
-gdt_end:
 
 section .bss
 

@@ -1,6 +1,7 @@
 
 ASMC := nasm
 QEMUC := qemu-system-x86_64
+QEMUFLAGS := -no-reboot
 
 ARCH := i686-elf
 CC := $(ARCH)-gcc
@@ -23,19 +24,15 @@ KERNEL_OBJS := $(KERNEL_C_OBJS) $(KERNEL_ASM_OBJS)
 
 ELF_ASM_OBJS := $(KERNEL_ASM_OBJS)
 
-BIN_ASM_SOURCES := first_boot.asm
+BIN_ASM_SOURCES := first_boot.asm second_boot.asm
 BIN_ASM_OBJS := $(patsubst %.asm,$(BUILD_DIR)/%.bin,$(BIN_ASM_SOURCES))
 
-define strip_build
-$(patsubst $(BUILD_DIR)/%,%,$1)
-endef
+$(BUILD_DIR)/boot.bin: $(BUILD_DIR)/first_boot.bin $(BUILD_DIR)/second_boot.bin $(BUILD_DIR)/kernel.bin
+	dd if=$(BUILD_DIR)/first_boot.bin of=$@  bs=512 conv=sync,notrunc 2> /dev/null
+	dd if=$(BUILD_DIR)/second_boot.bin of=$@ bs=512 seek=1 conv=sync,notrunc 2> /dev/null
+	dd if=$(BUILD_DIR)/kernel.bin of=$@ bs=512 seek=2 conv=sync,notrunc 2> /dev/null
 
-$(BUILD_DIR)/boot.bin: $(BUILD_DIR)/first_boot.bin $(BUILD_DIR)/kernel.bin
-	$(info Combining $(call strip_build,$^) into $(call strip_build,$@)...)
-	@dd if=$(BUILD_DIR)/first_boot.bin of=$@  bs=512 conv=sync,notrunc 2> /dev/null
-	@dd if=$(BUILD_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc 2> /dev/null
-	@# just make sure the size in sectors is correct
-	$(info The size of $(call strip_build,$@) is $(shell expr $$(stat --printf %s $@) / 512) sectors)
+	truncate -c -s 7680 $@
 
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
@@ -53,7 +50,7 @@ $(BIN_ASM_OBJS): $(BUILD_DIR)/%.bin: %.asm | $(BUILD_DIR)/
 	$(ASMC) -f bin $< -o $@
 
 run: $(BUILD_DIR)/boot.bin
-	$(QEMUC) -drive format=raw,file=$< 2> /dev/null
+	$(QEMUC) $(QEMUFLAGS) -drive format=raw,file=$<,if=ide
 
 $(BUILD_DIR)/:
 	@mkdir -p $(BUILD_DIR)

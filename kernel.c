@@ -11,9 +11,9 @@ void kernel_main() {
         "RAHHHHHH\n"
         "WHAT THE FUCK IS AN\n"
         "OS?????",
-        WHITE_FG | BLUE_BG);
+        WHITE | BLUE_BG);
 
-    print("The screen width is: ", WHITE_FG);
+    print("The screen width is: ", WHITE);
     printnum(vga_width);
     println("", 0);
     printnum(-1);

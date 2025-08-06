@@ -24,7 +24,7 @@ void putc(char c, char attr) {
 }
 
 void putc_white(char c) {
-    putc(c, WHITE_FG);
+    putc(c, WHITE);
 }
 
 inline void println(const char *str, char attr) {
