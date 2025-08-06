@@ -11,36 +11,49 @@ LDFLAGS := -nostdlib
 
 OBJCOPY := $(ARCH)-objcopy
 
-KERNEL_C_SOURCES := kernel.c io.c
-KERNEL_C_OBJS := $(patsubst %.c,build/%.c.o,$(KERNEL_C_SOURCES))
+BUILD_DIR := build
 
-build/boot.bin: build/first_boot.bin build/kernel.bin
-	dd if=build/first_boot.bin of=$@  bs=512 conv=sync,notrunc
-	dd if=build/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc
+KERNEL_C_SOURCES := kernel.c print.c
+KERNEL_C_OBJS := $(patsubst %.c,$(BUILD_DIR)/%.c.o,$(KERNEL_C_SOURCES))
 
-build/kernel.bin: build/kernel.elf
+KERNEL_ASM_SOURCES := kernel.asm print.asm
+KERNEL_ASM_OBJS := $(patsubst %.asm,$(BUILD_DIR)/%.asm.o,$(KERNEL_ASM_SOURCES))
+
+KERNEL_OBJS := $(KERNEL_C_OBJS) $(KERNEL_ASM_OBJS)
+
+ELF_ASM_OBJS := $(KERNEL_ASM_OBJS)
+
+BIN_ASM_SOURCES := first_boot.asm
+BIN_ASM_OBJS := $(patsubst %.asm,$(BUILD_DIR)/%.bin,$(BIN_ASM_SOURCES))
+
+$(BUILD_DIR)/boot.bin: $(BUILD_DIR)/first_boot.bin $(BUILD_DIR)/kernel.bin
+	dd if=$(BUILD_DIR)/first_boot.bin of=$@  bs=512 conv=sync,notrunc
+	dd if=$(BUILD_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=sync,notrunc
+
+$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-build/kernel.elf: $(KERNEL_C_OBJS) build/kernel.asm.o
+$(BUILD_DIR)/kernel.elf: $(KERNEL_OBJS)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $^
 
-build/%.c.o: %.c | build/
+$(BUILD_DIR)/%.c.o: %.c | $(BUILD_DIR)/
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-build/kernel.asm.o: kernel.asm | build/
+$(ELF_ASM_OBJS): $(BUILD_DIR)/%.asm.o: %.asm | $(BUILD_DIR)/
 	$(ASMC) -f elf32 $< -o $@
 
-build/first_boot.bin: first_boot.asm | build/
+$(BIN_ASM_OBJS): $(BUILD_DIR)/%.bin: %.asm | $(BUILD_DIR)/
 	$(ASMC) -f bin $< -o $@
 
-run: build/boot.bin
-	$(QEMUC) -drive format=raw,file=$<
+run: $(BUILD_DIR)/boot.bin
+	$(info Running qemu with $< image...)
+	@$(QEMUC) -drive format=raw,file=$<
 
-build/:
-	mkdir -p build
+$(BUILD_DIR)/:
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -vrf build
+	rm -vrf $(BUILD_DIR)
 
 .PHONY: run clean
 

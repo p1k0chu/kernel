@@ -1,18 +1,25 @@
-#include "io.h"
 #include "kernel_asm.h"
+#include "print.h"
+#include "vga_color.h"
 
 void kernel_main() {
-    // read vga width
-    outb(0x3D4, 0x1);
-    vga_width = inb(0x3D5) + 1;
+    print_init();
 
     clear_vga();
 
-    print(0,
-          0,
-          "RAHHHHHH\n"
-          "WHAT THE FUCK IS AN\n"
-          "OS?????\n",
-          WHITE_FG);
+    println(
+        "RAHHHHHH\n"
+        "WHAT THE FUCK IS AN\n"
+        "OS?????",
+        WHITE_FG | BLUE_BG);
+
+    print("The screen width is: ", WHITE_FG);
+    printnum(vga_width);
+    println("", 0);
+    printnum(-1);
+    println("", 0);
+    printnum(-69);
+    println("", 0);
+    printnum(69);
 }
 

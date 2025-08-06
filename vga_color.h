@@ -1,0 +1,4 @@
+
+#define WHITE_FG 0b00001111
+#define BLUE_BG 0b00010000
+
