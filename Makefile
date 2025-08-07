@@ -5,7 +5,7 @@ QEMUFLAGS := -no-reboot
 
 ARCH := i686-elf
 CC := $(ARCH)-gcc
-CFLAGS := -O2 -Wall -Wextra -Werror -ffreestanding -m32 -nostdlib -I.
+CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 -nostdlib -I.
 
 LD := $(ARCH)-ld
 LDFLAGS := -nostdlib
