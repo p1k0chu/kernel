@@ -1,6 +1,6 @@
 #include "print.h"
 
-#include "kernel_asm.h"
+#include "kernel.h"
 #include "vga_color.h"
 
 volatile short *const vga_mem = (void *)0xB8000;

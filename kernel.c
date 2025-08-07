@@ -1,4 +1,4 @@
-#include "kernel_asm.h"
+#include "kernel.h"
 #include "print.h"
 #include "vga_color.h"
 
