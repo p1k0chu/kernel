@@ -3,68 +3,95 @@ bits 32
 
 section .text
     global printnum
-    extern putc_white
+    extern cursor_y
+    extern cursor_x
+    extern vga_width
 
 ; print a number
-; one int argument: the number
+; args:
+; - int to print
+; - one byte color attribute
 printnum:
     push ebp
     mov ebp, esp
-    
-    mov eax, [ebp+8]
 
-    cmp eax, 0
-    jge .pos
+    push edi
+    push ebx
 
-    ; below
-    push '-'
-    call putc_white
-    add esp, 4
+    ; calculate start address
+    mov edi, 0xB8000
+    xor eax, eax
+    mov al, [cursor_y]
+    mov cl, [vga_width]
+    imul ax, cx
+    mov cl, [cursor_x]
+    add ax, cx
+    shl eax, 1
+    add edi, eax
 
-    mov eax, [ebp+8]
-    not eax
-    add eax, 1
-
-.pos:
+    mov eax, [ebp + 8]
     mov ebx, 10
     xor ecx, ecx
 
+    cmp eax, 0
+    jge .calc_loop
+
+    ; below 0!
+    ; print the -
+    mov byte [edi], '-'
+    inc edi
+    mov byte [edi], 15
+    inc edi
+
+    ; eax = abs(eax)
+    not eax
+    inc eax
+
+.calc_loop:
     cmp eax, 10
-    jl .stage2
+    jb .print
 
-.loop:
-    inc ecx
-    cdq
-
+    xor edx, edx
     div ebx
+
     push edx
-
-    cmp eax, 10
-    jge .loop
-
-.stage2:
     inc ecx
+
+    jmp .calc_loop
+
+.print:
     push eax
+    inc ecx
 
-.loop2:
-    cmp ecx, 0
-    je .return
+    mov eax, [cursor_x]
+    add eax, ecx
+    mov ebx, [vga_width]
+    cmp eax, ebx
+    jb .bla
 
-    dec ecx
+    xor edx, edx
+    div ebx
+
+    add [cursor_y], eax
+    mov [cursor_x], edx
+    jmp .print_loop
+
+.bla:
+    mov [cursor_x], eax
+
+.print_loop:
+    ; ecx has the N of characters
 
     pop eax
-    push ecx
-    add eax, '0'
-    push eax
+    add al, '0'
+    mov ah, [ebp+12]
+    mov [edi], ax
+    add edi, 2
 
-    ; call putc_white
-    call putc_white
-    add esp, 4
-    pop ecx
+    loop .print_loop
 
-    jmp .loop2
-
-.return:
+    mov edi, [ebp-4]
+    mov ebx, [ebp-8]
 
     leave
     ret
