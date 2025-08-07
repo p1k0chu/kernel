@@ -7,19 +7,10 @@ void kernel_main() {
 
     clear_vga();
 
-    println(
-        "RAHHHHHH\n"
-        "WHAT THE FUCK IS AN\n"
-        "OS?????",
-        WHITE | BLUE_BG);
-
-    print("The screen width is: ", WHITE);
-    printnum(vga_width);
-    println("", 0);
-    printnum(-1);
-    println("", 0);
-    printnum(-69);
-    println("", 0);
-    printnum(69);
+    for (unsigned char attr = 0; attr <= 15; ++attr) {
+        putc(' ', attr << 4);
+    }
+    cursor_x = 0;
+    ++cursor_y;
 }
 

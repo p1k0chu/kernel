@@ -17,22 +17,20 @@
 #define YELLOW       14
 #define WHITE        15
 
-#define BLACK_BG (BLACK << 4)
-#define BLUE_BG (BLUE << 4)
-#define GREEN_BG (GREEN << 4)
-#define CYAN_BG (CYAN << 4)
-#define RED_BG (RED << 4)
-#define PURPLE_BG (PURPLE << 4)
-#define BROWN_BG (BROWN << 4)
-#define GRAY_BG (GRAY << 4)
-
-// overlap with the blink bit. not usable colors
-//#define DARK_GRAY_BG (DARK_GRAY << 4)
-//#define LIGHT_BLUE_BG (LIGHT_BLUE << 4)
-//#define LIGHT_GREEN_BG (LIGHT_GREEN << 4)
-//#define LIGHT_CYAN_BG (LIGHT_CYAN << 4)
-//#define LIGHT_RED_BG (LIGHT_RED << 4)
-//#define LIGHT_PURPLE_BG (LIGHT_PURPLE << 4)
-//#define YELLOW_BG (YELLOW << 4)
-//#define WHITE_BG (WHITE << 4)
+#define BLACK_BG ((char)(BLACK << 4))
+#define BLUE_BG ((char)(BLUE << 4))
+#define GREEN_BG ((char)(GREEN << 4))
+#define CYAN_BG ((char)(CYAN << 4))
+#define RED_BG ((char)(RED << 4))
+#define PURPLE_BG ((char)(PURPLE << 4))
+#define BROWN_BG ((char)(BROWN << 4))
+#define GRAY_BG ((char)(GRAY << 4))
+#define DARK_GRAY_BG ((char)(DARK_GRAY << 4))
+#define LIGHT_BLUE_BG ((char)(LIGHT_BLUE << 4))
+#define LIGHT_GREEN_BG ((char)(LIGHT_GREEN << 4))
+#define LIGHT_CYAN_BG ((char)(LIGHT_CYAN << 4))
+#define LIGHT_RED_BG ((char)(LIGHT_RED << 4))
+#define LIGHT_PURPLE_BG ((char)(LIGHT_PURPLE << 4))
+#define YELLOW_BG ((char)(YELLOW << 4))
+#define WHITE_BG ((char)(WHITE << 4))
 
