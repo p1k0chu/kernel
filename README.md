@@ -3,8 +3,9 @@
 this is my kernel written from nothing for learning purposes.  
 its x86 assembly.
 
-it contains first and second stage bootloader,  
-second entering protected mode and linking together with 32 bit C code
+it contains first and second stage bootloader and a kernel,  
+second entering protected mode and loading the kernel at 1 MB in ram ("high memory")  
+the kernel is a combination of NASM and C (both 32 bit)
 
 # Build
 
