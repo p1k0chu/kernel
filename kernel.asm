@@ -6,28 +6,17 @@ section .start
     global _start
 
 _start:
-    mov edi, 0xb8000
-    mov byte [edi], 'H'
-    add edi, 2
-    mov byte [edi], 'I'
-    add edi, 2
-    mov byte [edi], 'I'
-    add edi, 2
-    mov byte [edi], 'I'
-
-    jmp start
-
-section .text
-    extern kernel_main
-    global inb
-    global outb
-
-start:
     ; setup stack
     mov esp, stack_top
     mov ebp, esp
 
     call kernel_main
+    jmp hang
+
+section .text
+    extern kernel_main
+    global inb
+    global outb
 
 hang:
     hlt
