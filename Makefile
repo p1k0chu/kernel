@@ -1,16 +1,16 @@
-
 ASMC := nasm
 QEMUC := qemu-system-x86_64
 QEMUFLAGS := -no-reboot
 
-ARCH := i686-elf
-CC := $(ARCH)-gcc
-CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 -nostdlib -I.
+TARGET := i686-none-elf
+CC := clang
+CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
+	  -nostdinc -I. -target $(TARGET)
 
-LD := $(ARCH)-ld
+LD := ld.lld
 LDFLAGS := -nostdlib
 
-OBJCOPY := $(ARCH)-objcopy
+OBJCOPY := objcopy
 
 BUILD_DIR := build
 

@@ -9,10 +9,7 @@ the kernel is a combination of NASM and C (both 32 bit)
 
 # Build
 
-Requires you to compile GCC manually for `i686-elf` target  
-you can find a guide for compilation [here](https://wiki.osdev.org/GCC_Cross-Compiler)
-
-make sure the compiler is in your path.
+Install `clang` compiler and `lld` (llvm linker)
 
 and you can just run `make` to get a boot.bin raw binary!
 
