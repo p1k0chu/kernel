@@ -5,7 +5,7 @@ QEMUFLAGS := -no-reboot
 TARGET := i686-none-elf
 CC := clang
 CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
-	  -nostdinc -I. -target $(TARGET)
+	  -nostdinc -I. -target $(TARGET) -O2
 
 LD := ld.lld
 LDFLAGS := -nostdlib
