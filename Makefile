@@ -17,7 +17,7 @@ QEMUC := qemu-system-$(ARCH)
 RM := rm -vrf
 
 CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
-   -I. -target $(TARGET) -O2
+   -I. -target $(TARGET)
 
 LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot
