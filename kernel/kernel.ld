@@ -4,12 +4,16 @@ SECTIONS {
   . = 0x100000;
 
   .text : {
-      KEEP(*(.start))
-      *(.text)
+    KEEP(*(.start))
+    *(.text)
   }
 
   .data : {
     *(.data)
+  }
+
+  .rodata : {
+    *(.rodata*)
   }
 
   .bss : {
