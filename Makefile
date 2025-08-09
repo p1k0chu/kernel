@@ -8,7 +8,7 @@ OBJCOPY := objcopy
 QEMUC := qemu-system-$(ARCH)
 
 CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
-	  -nostdinc -I. -target $(TARGET) -O2
+	  -I. -target $(TARGET) -O2
 
 LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot

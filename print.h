@@ -1,7 +1,9 @@
+#include <stdint.h>
+
 extern int cursor_x;
 extern int cursor_y;
 
-extern unsigned char vga_width;
+extern uint8_t vga_width;
 
 void putc(char c, char attr);
 void putc_white(char);

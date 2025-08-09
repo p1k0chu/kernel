@@ -3,8 +3,10 @@
 #include "kernel.h"
 #include "vga_color.h"
 
+#include <stdint.h>
+
 volatile short *const vga_mem = (void *)0xB8000;
-unsigned char         vga_width;
+uint8_t               vga_width;
 
 int cursor_x = 0;
 int cursor_y = 0;
