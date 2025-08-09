@@ -21,8 +21,14 @@ QEMUFLAGS := -no-reboot
 BIN_ASM_SOURCES := first_boot.s second_boot.s
 BIN_ASM_OBJS := $(patsubst %.s,$(O)/%.bin,$(BIN_ASM_SOURCES))
 
+ifeq ($(SHOW_DD), 1)
+SILENCE_DD :=
+else
+SILENCE_DD := 2> /dev/null
+endif
+
 $(O)/boot.bin: $(BIN_ASM_OBJS) kernel/$(O)/kernel.bin
-	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc 2> /dev/null;)
+	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc $(SILENCE_DD);)
 
 	truncate -c -s 7680 $@
 
