@@ -1,3 +1,4 @@
+#pragma once
 
 // talk to hardware, send data
 void outb(short port, char data);
