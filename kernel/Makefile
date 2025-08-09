@@ -1,5 +1,3 @@
-O := build
-
 include ../scripts/util.mk
 
 KERNEL_C_SOURCES := $(wildcard *.c)

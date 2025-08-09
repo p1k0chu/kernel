@@ -1,13 +1,12 @@
 ; second stage boot loader
 
 bits 16
-org 0x8000
 
 %define DRQ 0x8
 %define BSY 0x80
 %define KERNEL_SECTORS 10
 
-section .text
+section .start
     global start
 
 start:
@@ -22,6 +21,8 @@ start:
     jmp 0x08:pmode_start
 
 bits 32
+
+section .text
 
 pmode_start:
     ; set all segment registers to 0x10

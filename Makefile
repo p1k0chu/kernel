@@ -1,5 +1,6 @@
-O := build
-SUBDIRS := kernel
+export O := build
+
+SUBDIRS := kernel second_boot
 SUBDIRS_TARGETS := $(patsubst %,%-submake,$(SUBDIRS))
 
 export ARCH := x86_64
@@ -18,26 +19,24 @@ export CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
 export LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot
 
-BIN_ASM_SOURCES := first_boot.s second_boot.s
-BIN_ASM_OBJS := $(patsubst %.s,$(O)/%.bin,$(BIN_ASM_SOURCES))
-
 ifeq ($(SHOW_DD), 1)
 SILENCE_DD :=
 else
 SILENCE_DD := 2> /dev/null
 endif
 
-$(O)/boot.bin: $(BIN_ASM_OBJS) kernel/$(O)/kernel.bin
+$(O)/boot.bin: $(O)/first_boot.bin second_boot/$(O)/second_boot.bin kernel/$(O)/kernel.bin
 	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc $(SILENCE_DD);)
 
 	truncate -c -s 7680 $@
 
 kernel/$(O)/kernel.bin: kernel-submake
+second_boot/$(O)/second_boot.bin: second_boot-submake
 
 $(SUBDIRS_TARGETS): %-submake: %
 	$(MAKE) -C $<
 
-$(BIN_ASM_OBJS): $(O)/%.bin: %.s | $(O)/
+$(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
 
 run: $(O)/boot.bin
