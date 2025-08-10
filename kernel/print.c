@@ -4,6 +4,7 @@
 #include "vga_color.h"
 
 #include <stdint.h>
+#include <string.h>
 
 volatile short *const vga_mem = (void *)0xB8000;
 uint8_t               vga_width;
@@ -49,10 +50,7 @@ void print(const char *str, char attr) {
 }
 
 void clear_vga() {
-    int total = vga_width * 25;
-    for (int i = 0; i < total; ++i) {
-        vga_mem[i] = 0;
-    }
+    memset((void *)vga_mem, 0, vga_width * 25 * 2);
     cursor_x = 0;
     cursor_y = 0;
 }

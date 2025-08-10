@@ -65,7 +65,7 @@ KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS)
+$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib32.a
 	$(LD) $(LDFLAGS) -o $@ $^
 
 
