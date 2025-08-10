@@ -4,11 +4,19 @@ bits 32
 
 section .start
     global _start
+    extern setup_idt
 
 _start:
     ; setup stack
     mov esp, stack_top
     mov ebp, esp
+
+    mov al, 0xFF
+    out 0x21, al    ; mask master PIC
+    out 0xA1, al    ; mask slave PIC
+
+    call setup_idt
+    sti
 
     call kernel_main
     jmp hang
