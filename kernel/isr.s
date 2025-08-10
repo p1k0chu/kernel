@@ -6,8 +6,22 @@ section .text
 
 %macro ISR 1
 isr_%+%1:
-    push %1
+    pushad ; 8 registers
+    mov ebp, esp
+
+    ;mov [esp-4], [esp] ; move the return address
+
+    push dword [ebp+48] ; error code
+    push dword [ebp+44] ; eflags
+    push dword [ebp+40] ; cs
+    push dword [ebp+36] ; EIP
+    push dword %1 ; error vector
+    
     call exc_handler
+
+    ;mov [esp], [esp-4]
+    popad
+
     iret
 %endmacro
 
