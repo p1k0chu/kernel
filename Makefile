@@ -13,11 +13,13 @@ ASMC := nasm
 CC := clang
 LD := ld.lld
 OBJCOPY := objcopy
+AR := llvm-ar
+
 QEMUC := qemu-system-$(ARCH)
 RM := rm -vrf
 
 CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
-   -I. -target $(TARGET)
+   -Iinclude -target $(TARGET)
 
 LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot
@@ -41,6 +43,17 @@ $(O)/boot.bin: $(O)/first_boot.bin $(O)/second_boot.bin $(O)/kernel.bin
 
 $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
+
+
+##############
+### STDLIB ###
+##############
+
+STDLIB32_SRC := stdlib/memory32.s
+STDLIB32_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB32_SRC))
+
+$(O)/libstdlib32.a: $(STDLIB32_OBJS)
+	$(AR) rcs $@ $^
 
 ##############
 ### KERNEL ###
