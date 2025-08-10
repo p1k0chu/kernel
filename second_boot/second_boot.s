@@ -50,7 +50,6 @@ pmode_start:
 
     ; start with 3rd sector
     inc dx
-    ; al = 2
     %if KERNEL_SECTORS != 2
     mov al, 2
     %endif

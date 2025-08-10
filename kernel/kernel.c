@@ -1,5 +1,6 @@
 #include "kernel.h"
 
+#include "kernel_idt.h"
 #include "print.h"
 #include "vga_color.h"
 
@@ -7,6 +8,7 @@
 
 void kernel_main() {
     print_init();
+    setup_idt();
 
     clear_vga();
 
