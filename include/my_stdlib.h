@@ -1,3 +1,5 @@
+#pragma once
+
 // functions not present in standard stdlib header
 
 // sets N words of S to C
