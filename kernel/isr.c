@@ -79,6 +79,22 @@ void exc_handler(int                    vector,
         printnum(vga + y * 80 + x * 10, esp[i], 16);
     }
 
+    const char msg_registers[] = "Registers:";
+    const char reg_names[][3]  = {"edi", "esi", "ebp", "esp", "ebx", "edx", "ecx", "eax"};
+
+    vga = (short *)0xB8000 + 44 + 80;
+    printstr(&vga, msg_registers, sizeof(msg_registers) - 1);
+    vga = (short *)0xB8000 + 40 + 80 * 3;
+
+    uint32_t      *reg_array = (uint32_t *)&registers;
+    const uint32_t size      = sizeof(struct pushad_frame) / sizeof(uint32_t);
+
+    for (uint32_t i = 0; i < size; ++i) {
+        printstr(&vga, reg_names[i], sizeof(reg_names[i]));
+        printnum(++vga, reg_array[i], 16);
+        vga = (short *)0xB8000 + 40 + 80 * (4 + i);
+    }
+
     asm volatile("cli");
     for (;;) {
         asm volatile("hlt");
