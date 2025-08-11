@@ -60,7 +60,7 @@ $(O)/libidt.a: $(IDT_OBJS)
 ### STDLIB ###
 ##############
 
-STDLIB32_SRC := stdlib/memory32.s
+STDLIB32_SRC := stdlib/memory32.s stdlib/print.c
 STDLIB32_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB32_SRC))
 
 $(O)/libstdlib32.a: $(STDLIB32_OBJS)

@@ -1,7 +1,6 @@
 #include "idt.h"
 
 #include "isr.h"
-#include "my_stdlib.h"
 
 idt_t  *idt  = (void *)0x180000;
 idtr_t *idtr = (void *)0x170000;
