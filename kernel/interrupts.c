@@ -1,11 +1,16 @@
 #include "interrupts.h"
 
+#include "kernel.h"
+
 #include <my_stdio.h>
 #include <my_stdlib.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <vga_color.h>
 
-#define BSOD_COLOR (WHITE | BLUE_BG)
+#define BSOD_COLOR         (WHITE | BLUE_BG)
+#define STACK_DUMP_ROWS    16
+#define STACK_DUMP_COLUMNS 4
 
 #define PRINT_PAIR(vga, msg, value, base, color)              \
     {                                                         \
@@ -58,10 +63,17 @@ void exc_handler(int                    vector,
     printstr(vga + 3, msg_stack_dump, sizeof(msg_stack_dump) - 1, WHITE | BLUE_BG);
     vga += 80;
 
-    uint32_t *esp = (void *)registers.esp;
-    for (uint32_t i = 0; i < 40; ++i) {
-        const uint8_t x = i / 10;
-        const uint8_t y = i % 10;
+    uint32_t *esp        = (void *)registers.esp;
+    uint32_t  stack_top  = (uint32_t)get_stack_top();
+    uint32_t  stack_size = (stack_top - (uint32_t)esp) / sizeof(size_t);
+
+    if (stack_size > STACK_DUMP_ROWS * STACK_DUMP_COLUMNS) {
+        stack_size = STACK_DUMP_ROWS * STACK_DUMP_COLUMNS;
+    }
+
+    for (uint32_t i = 0; i < stack_size; ++i) {
+        const uint8_t x = i / STACK_DUMP_ROWS;
+        const uint8_t y = i % STACK_DUMP_ROWS;
         printnum(vga + y * 80 + x * 10, esp[i], 16, WHITE | BLUE_BG);
     }
 

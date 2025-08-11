@@ -25,6 +25,7 @@ section .text
     extern kernel_main
     global inb
     global outb
+    global get_stack_top
 
 hang:
     hlt
@@ -57,6 +58,11 @@ inb:
     in al, dx
 
     leave
+    ret
+
+; 😭 BRO IS CODING IN JAVA OR WHAT?
+get_stack_top:
+    mov eax, stack_top
     ret
 
 section .bss
