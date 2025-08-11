@@ -27,8 +27,5 @@ void setup_idt();
 
 // vector is the exception index
 // code is optional error code (some of them have it)
-void exc_handler(int                    vector,
-                 struct interrupt_frame interrupts,
-                 uint32_t               code,
-                 struct pushad_frame    registers);
+void exc_handler(int vector, struct pushad_frame registers, struct interrupt_frame interrupts);
 

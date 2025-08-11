@@ -29,12 +29,8 @@ void setup_idt() {
     load_idtr(&idtr);
 }
 
-void exc_handler(int                    vector,
-                 struct interrupt_frame interrupts,
-                 uint32_t               code,
-                 struct pushad_frame    registers) {
+void exc_handler(int vector, struct pushad_frame registers, struct interrupt_frame interrupts) {
     const char msg[]            = "Cpu fault:";
-    const char msg2[]           = "Code, if any:";
     const char msg3[]           = "Instruction address:";
     const char msg4[]           = "CS:";
     const char msg5[]           = "EFLAGS:";
@@ -46,9 +42,6 @@ void exc_handler(int                    vector,
     vga += 80 + 1;
 
     PRINT_PAIR(vga, msg, vector, 10, BSOD_COLOR);
-    vga += 80;
-
-    PRINT_PAIR(vga, msg2, code, 10, BSOD_COLOR);
     vga += 80;
 
     PRINT_PAIR(vga, msg3, interrupts.eip, 16, BSOD_COLOR);
