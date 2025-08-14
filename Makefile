@@ -49,10 +49,18 @@ $(O)/first_boot.bin: first_boot.s | $(O)/
 ### STDLIB ###
 ##############
 
-STDLIB32_SRC := stdlib/memory32.s stdlib/print.c
-STDLIB32_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB32_SRC))
+STDLIB_COMMON_SRC := stdlib/print.c
+
+STDLIB32_SRC := $(STDLIB_COMMON_SRC) stdlib/memory32.s
+STDLIB32_OBJS := $(patsubst %,$(O)/%.o32,$(STDLIB32_SRC))
 
 $(O)/libstdlib32.a: $(STDLIB32_OBJS)
+	$(AR) rcs $@ $^
+
+STDLIB_SRC := $(STDLIB_COMMON_SRC) stdlib/memory64.s
+STDLIB_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB_SRC))
+
+$(O)/libstdlib.a: $(STDLIB_OBJS)
 	$(AR) rcs $@ $^
 
 ##############
@@ -60,7 +68,7 @@ $(O)/libstdlib32.a: $(STDLIB32_OBJS)
 ##############
 
 KERNEL_SRC := $(wildcard kernel/*.c) $(wildcard kernel/*.s)
-KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
+KERNEL_OBJS := $(patsubst %,$(O)/%.o32,$(KERNEL_SRC))
 
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
@@ -74,7 +82,7 @@ $(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib32.a
 ###############################
 
 SECOND_BOOT_SRC := $(wildcard second_boot/*.c) $(wildcard second_boot/*.s)
-SECOND_BOOT_OBJS := $(patsubst %,$(O)/%.o,$(SECOND_BOOT_SRC))
+SECOND_BOOT_OBJS := $(patsubst %,$(O)/%.o32,$(SECOND_BOOT_SRC))
 
 $(O)/second_boot.bin: $(O)/second_boot.elf
 	$(OBJCOPY) -O binary $< $@
@@ -110,5 +118,12 @@ $(O)/%.c.o: %.c | $$(dir $$@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(O)/%.s.o: %.s | $$(dir $$@)
+	$(ASMC) -f elf64 -o $@ $<
+
+# 32 bit version for c and asm files
+$(O)/%.c.o32: %.c | $$(dir $$@)
+	$(CC) $(CFLAGS) -m32 -c -o $@ $<
+
+$(O)/%.s.o32: %.s | $$(dir $$@)
 	$(ASMC) -f elf32 -o $@ $<
 
