@@ -4,7 +4,7 @@ bits 16
 
 %define DRQ 0x8
 %define BSY 0x80
-%define KERNEL_SECTORS 10
+%define KERNEL_SECTORS 20
 
 section .start
     global start

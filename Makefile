@@ -39,7 +39,7 @@ $(O)/boot.bin: $(O)/first_boot.bin $(O)/second_boot.bin $(O)/kernel.bin
 	@$(RM) $@
 	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc $(SILENCE_DD);)
 
-	truncate -c -s 7680 $@
+	truncate -c -s 11264 $@
 
 $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
