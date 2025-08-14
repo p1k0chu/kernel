@@ -38,9 +38,9 @@ struct pushad_frame {
 typedef idt32_t idt_t;
 #endif
 
-extern idt_t  idt[];
+extern idt_t  idt[32];
 extern idtr_t idtr;
-extern void  *isr_stub_table[];
+extern void  *isr_stub_table[32];
 
 void load_idtr(void *);
 void idt_set_descriptor(idt_t *dst, void *isr, uint8_t flags);
