@@ -7,9 +7,9 @@ bits 16
 %define KERNEL_SECTORS 20
 
 section .start
-    global start
+    global _start
 
-start:
+_start:
     cli
     lgdt [gdtr]
 
