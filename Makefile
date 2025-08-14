@@ -39,17 +39,28 @@ $(O)/boot.bin: $(O)/first_boot.bin $(O)/second_boot.bin $(O)/kernel.bin
 	@$(RM) $@
 	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc $(SILENCE_DD);)
 
-	truncate -c -s 7680 $@
+	truncate -c -s 11264 $@
 
 $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
+
+
+##########################
+### COMMON (libraries) ###
+##########################
+
+IDT_SRC := common/idt.c common/idt.s
+IDT_OBJS := $(patsubst %,$(O)/%.o,$(IDT_SRC))
+
+$(O)/libidt.a: $(IDT_OBJS)
+	$(AR) rcs $@ $^
 
 
 ##############
 ### STDLIB ###
 ##############
 
-STDLIB32_SRC := stdlib/memory32.s
+STDLIB32_SRC := stdlib/memory32.s stdlib/print.c
 STDLIB32_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB32_SRC))
 
 $(O)/libstdlib32.a: $(STDLIB32_OBJS)
@@ -65,7 +76,7 @@ KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib32.a
+$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libidt.a $(O)/libstdlib32.a
 	$(LD) $(LDFLAGS) -o $@ $^
 
 

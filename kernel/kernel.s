@@ -4,11 +4,19 @@ bits 32
 
 section .start
     global _start
+    extern setup_idt
 
 _start:
     ; setup stack
     mov esp, stack_top
     mov ebp, esp
+
+    mov al, 0xFF
+    out 0x21, al    ; mask master PIC
+    out 0xA1, al    ; mask slave PIC
+
+    call setup_idt
+    sti
 
     call kernel_main
     jmp hang
@@ -17,6 +25,7 @@ section .text
     extern kernel_main
     global inb
     global outb
+    global get_stack_top
 
 hang:
     hlt
@@ -49,6 +58,11 @@ inb:
     in al, dx
 
     leave
+    ret
+
+; 😭 BRO IS CODING IN JAVA OR WHAT?
+get_stack_top:
+    mov eax, stack_top
     ret
 
 section .bss
