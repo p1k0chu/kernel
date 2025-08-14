@@ -29,6 +29,14 @@ void setup_idt() {
     load_idtr(&idtr);
 }
 
+void idt_set_descriptor(idt_t *dst, void *isr, uint8_t flags) {
+    dst->isr_low         = (uint32_t)isr & 0xFFFF;
+    dst->selector        = 0x08;
+    dst->type_attributes = flags;
+    dst->isr_high        = ((uint32_t)isr >> 16) & 0xFFFF;
+    dst->reserved        = 0;
+}
+
 void exc_handler(int vector, struct pushad_frame registers, struct interrupt_frame interrupts) {
     const char msg[]            = "Cpu fault:";
     const char msg3[]           = "Instruction address:";

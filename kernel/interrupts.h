@@ -1,6 +1,19 @@
 #pragma once
 
-#include "idt.h"
+#include <stdint.h>
+
+typedef struct idt32_t {
+    uint16_t isr_low;
+    uint16_t selector;
+    uint8_t  reserved;        // unused, set to 0
+    uint8_t  type_attributes; // gate type, dpl, and p fields
+    uint16_t isr_high;
+} __attribute__((packed)) idt32_t;
+
+typedef struct {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed)) idtr_t;
 
 struct interrupt_frame {
     uint32_t eip;
@@ -19,10 +32,18 @@ struct pushad_frame {
     uint32_t eax;
 };
 
+#ifdef LONG_MODE
+#error ("not yet implemented")
+#else
+typedef idt32_t idt_t;
+#endif
+
 extern idt_t  idt[];
 extern idtr_t idtr;
 extern void  *isr_stub_table[];
 
+void load_idtr(void *);
+void idt_set_descriptor(idt_t *dst, void *isr, uint8_t flags);
 void setup_idt();
 
 // vector is the exception index

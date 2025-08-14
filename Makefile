@@ -45,17 +45,6 @@ $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
 
 
-##########################
-### COMMON (libraries) ###
-##########################
-
-IDT_SRC := common/idt.c common/idt.s
-IDT_OBJS := $(patsubst %,$(O)/%.o,$(IDT_SRC))
-
-$(O)/libidt.a: $(IDT_OBJS)
-	$(AR) rcs $@ $^
-
-
 ##############
 ### STDLIB ###
 ##############
@@ -76,7 +65,7 @@ KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libidt.a $(O)/libstdlib32.a
+$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib32.a
 	$(LD) $(LDFLAGS) -o $@ $^
 
 

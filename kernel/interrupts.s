@@ -1,7 +1,15 @@
 bits 32
 
 section .text
+    global load_idtr
     extern exc_handler
+
+; 1 arg - pointer at idtr
+load_idtr:
+    mov eax, [esp+4]
+    lidt [eax]
+
+    ret
 
 %macro ISR 1
 isr_%+%1:
