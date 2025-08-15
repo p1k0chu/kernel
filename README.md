@@ -1,11 +1,13 @@
 # kernel
 
 this is my kernel written from nothing for learning purposes.  
-its x86 assembly.
+its x86\_64 assembly.
 
 it contains first and second stage bootloader and a kernel,  
-second entering protected mode and loading the kernel at 1 MB in ram ("high memory")  
-the kernel is a combination of NASM and C (both 32 bit)
+second entering long mode and loading the kernel at 1 MB in ram
+
+second boot loader is 32 bit nasm + C  
+the kernel is x86\_64 NASM + C
 
 # Build
 
