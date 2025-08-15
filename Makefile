@@ -49,7 +49,7 @@ $(O)/first_boot.bin: first_boot.s | $(O)/
 ### STDLIB ###
 ##############
 
-STDLIB_SRC := stdlib/print.c stdlib/memory.s
+STDLIB_SRC := stdlib/print.c stdlib/memory.s stdlib/string.c
 STDLIB_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB_SRC))
 
 $(O)/libstdlib.a: $(STDLIB_OBJS)
