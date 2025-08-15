@@ -49,15 +49,7 @@ $(O)/first_boot.bin: first_boot.s | $(O)/
 ### STDLIB ###
 ##############
 
-STDLIB_COMMON_SRC := stdlib/print.c
-
-STDLIB32_SRC := $(STDLIB_COMMON_SRC) stdlib/memory32.s
-STDLIB32_OBJS := $(patsubst %,$(O)/%.o32,$(STDLIB32_SRC))
-
-$(O)/libstdlib32.a: $(STDLIB32_OBJS)
-	$(AR) rcs $@ $^
-
-STDLIB_SRC := $(STDLIB_COMMON_SRC) stdlib/memory64.s
+STDLIB_SRC := stdlib/print.c stdlib/memory.s
 STDLIB_OBJS := $(patsubst %,$(O)/%.o,$(STDLIB_SRC))
 
 $(O)/libstdlib.a: $(STDLIB_OBJS)
