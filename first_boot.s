@@ -9,7 +9,7 @@ start:
     mov es, ax
 
     mov ah, 0x02     ; BIOS read sector function
-    mov al, 1        ; Read 1 sector
+    mov al, 2        ; Read 2 sector
     mov ch, 0        ; Cylinder 0
     mov cl, 2        ; first sector will be 2
     mov dh, 0        ; Head 0

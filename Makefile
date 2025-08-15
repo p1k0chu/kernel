@@ -18,7 +18,7 @@ AR := llvm-ar
 QEMUC := qemu-system-$(ARCH)
 RM := rm -vrf
 
-CFLAGS := -Wall -Wextra -Werror -ffreestanding -m32 \
+CFLAGS := -Wall -Wextra -Werror -ffreestanding \
    -Iinclude -target $(TARGET) -std=gnu23
 
 LDFLAGS := -nostdlib
@@ -39,7 +39,7 @@ $(O)/boot.bin: $(O)/first_boot.bin $(O)/second_boot.bin $(O)/kernel.bin
 	@$(RM) $@
 	$(foreach file,$^, dd if=$(file) of=$@ bs=512 oflag=append conv=sync,notrunc $(SILENCE_DD);)
 
-	truncate -c -s 11264 $@
+	truncate -c -s 11776 $@
 
 $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
@@ -67,13 +67,13 @@ $(O)/libstdlib.a: $(STDLIB_OBJS)
 ### KERNEL ###
 ##############
 
-KERNEL_SRC := $(wildcard kernel/*.c) $(wildcard kernel/*.s)
-KERNEL_OBJS := $(patsubst %,$(O)/%.o32,$(KERNEL_SRC))
+KERNEL_SRC := kernel/interrupts.c kernel/interrupts.s kernel/kernel.c kernel/kernel.s
+KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
 
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib32.a
+$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib.a
 	$(LD) $(LDFLAGS) -o $@ $^
 
 
@@ -126,4 +126,5 @@ $(O)/%.c.o32: %.c | $$(dir $$@)
 
 $(O)/%.s.o32: %.s | $$(dir $$@)
 	$(ASMC) -f elf32 -o $@ $<
+
 

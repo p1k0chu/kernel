@@ -1,15 +1,16 @@
 ; kernel asm side
 
-bits 32
+bits 64
 
 section .start
     global _start
+    extern kernel_main
     extern setup_idt
 
 _start:
     ; setup stack
-    mov esp, stack_top
-    mov ebp, esp
+    mov rsp, stack_top
+    mov rbp, rsp
 
     mov al, 0xFF
     out 0x21, al    ; mask master PIC
@@ -22,7 +23,6 @@ _start:
     jmp hang
 
 section .text
-    extern kernel_main
     global inb
     global outb
     global get_stack_top
@@ -36,14 +36,10 @@ hang:
 ; - port (short)
 ; - data (byte)
 outb:
-    push ebp
-    mov ebp, esp
-
-    mov dx, [ebp + 8]
-    mov al, [ebp + 12]
+    mov dx, di
+    mov al, sil
     out dx, al
 
-    leave
     ret
 
 ; talk to hardware, recv data
@@ -51,18 +47,14 @@ outb:
 ; - port (short)
 ; returns a byte
 inb:
-    push ebp
-    mov ebp, esp
-
-    mov dx, [ebp + 8]
+    mov dx, di
     in al, dx
 
-    leave
     ret
 
 ; 😭 BRO IS CODING IN JAVA OR WHAT?
 get_stack_top:
-    mov eax, stack_top
+    mov rax, stack_top
     ret
 
 section .bss

@@ -6,12 +6,17 @@ bits 16
 %define BSY 0x80
 %define KERNEL_SECTORS 20
 
+%macro LOGLETTER 1
+mov edi, 0xB8000
+mov byte [edi], %1
+%endmacro
+
 section .start
     global _start
 
 _start:
     cli
-    lgdt [gdtr]
+    lgdt [gdtr32]
 
     ; set the protected mode bit
     mov eax, cr0
@@ -23,6 +28,8 @@ _start:
 bits 32
 
 section .text
+    extern setup_long_mode
+    extern setup_paging
 
 pmode_start:
     ; set all segment registers to 0x10
@@ -48,10 +55,10 @@ pmode_start:
     mov al, KERNEL_SECTORS
     out dx, al
 
-    ; start with 3rd sector
+    ; start with 4th sector
     inc dx
-    %if KERNEL_SECTORS != 2
-    mov al, 2
+    %if KERNEL_SECTORS != 3
+    mov al, 3
     %endif
     out dx, al
 
@@ -103,8 +110,34 @@ pmode_start:
     cmp ebx, 0
     jne .loop_sector
 
-    ; reading is done. execute
-    jmp 0x100000 ; 1 MB
+    ; reading is done. set up long mode
+
+    call setup_paging
+
+    ; enable PAE
+    mov eax, cr4
+    or eax, 1 << 5
+    mov cr4, eax
+
+    EFER_MSR equ 0xC0000080
+    EFER_LM_ENABLE equ 1 << 8
+
+    ; enable long mode in EFER
+    mov ecx, EFER_MSR
+    rdmsr
+    or eax, EFER_LM_ENABLE
+    wrmsr
+
+    ; enable paging (enables long mode)
+    mov eax, cr0
+    or eax, 1 | (1 << 31)
+    mov cr0, eax
+
+    lgdt [gdtr64]
+
+    ; everything is set up,
+    ; long jump to the 64 bit kernel
+    jmp 0x08:0x100000 ; 1 MB
 
 ; accepts 3 args:
 ; - port
@@ -130,15 +163,25 @@ wait_for_status:
     ret
 
 section .data
-    gdtr:
-        dw gdt_end - gdt - 1
-        dd gdt
-    
-    gdt:
+    gdtr32:
+        dw gdt32_end - gdt32 - 1
+        dd gdt32
+
+    gdt32:
         dq 0 ; null descriptor
         dq 0x00CF9A000000FFFF ; Code segment descriptor
         dq 0x00CF92000000FFFF ; Data segment descriptor
-    gdt_end:
+    gdt32_end:
+
+    gdt64:
+        dq 0                  ; Null descriptor
+        dq 0x00AF9A000000FFFF ; Code segment
+        dq 0x00CF92000000FFFF ; Data segment
+    gdt64_end:
+    
+    gdtr64:
+        dw gdt64_end - gdt64 - 1 ; limit
+        dq gdt64                 ; base
 
 section .bss
     stack_bottom:
