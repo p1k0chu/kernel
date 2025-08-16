@@ -92,7 +92,6 @@ run: $(O)/boot.bin
 
 clean:
 	$(RM) $(O)
-	$(foreach dir,$(SUBDIRS),$(MAKE) -C $(dir) $@;)
 
 .PHONY: clean run
 
