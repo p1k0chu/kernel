@@ -3,13 +3,13 @@
 bits 64
 
 section .start
-    global _start
+    global main
     extern kernel_main
     extern setup_idt
 
-_start:
+main:
     ; setup stack
-    mov rsp, stack_top
+    lea rsp, [rel stack_top]
     mov rbp, rsp
 
     mov al, 0xFF
@@ -54,7 +54,7 @@ inb:
 
 ; 😭 BRO IS CODING IN JAVA OR WHAT?
 get_stack_top:
-    mov rax, stack_top
+    lea rax, [rel stack_top]
     ret
 
 section .bss

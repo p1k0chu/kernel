@@ -8,20 +8,29 @@ ARCH := x86_64
 TARGET := $(ARCH)-none-elf
 
 O := build
+GEN := generated
 
 ASMC := nasm
 CC := clang
+CXX := clang++
 LD := ld.lld
+LLC := llc
 OBJCOPY := objcopy
 AR := llvm-ar
+KOTLINC := kotlinc-native
+KOTLIN_CINTEROP := cinterop
 
 QEMUC := qemu-system-$(ARCH)
 RM := rm -vrf
 
-CFLAGS := -Wall -Wextra -Werror -ffreestanding \
-   -Iinclude -target $(TARGET) -std=gnu23
+CFLAGS := -Wall -Wextra -Werror -ffreestanding -fPIC \
+   -Iinclude -I$(GEN) -target $(TARGET) -std=gnu23
+
+CXXFLAGS := $(CFLAGS)
 
 LDFLAGS := -nostdlib
+KOTLINC_FLAGS := -Wextra -produce static -opt -nostdlib -no-default-libs
+
 QEMUFLAGS := -no-reboot
 
 ifeq ($(SHOW_DD), 1)
@@ -44,7 +53,6 @@ $(O)/boot.bin: $(O)/first_boot.bin $(O)/second_boot.bin $(O)/kernel.bin
 $(O)/first_boot.bin: first_boot.s | $(O)/
 	$(ASMC) -f bin -o $@ $<
 
-
 ##############
 ### STDLIB ###
 ##############
@@ -59,15 +67,32 @@ $(O)/libstdlib.a: $(STDLIB_OBJS)
 ### KERNEL ###
 ##############
 
-KERNEL_SRC := kernel/interrupts.c kernel/interrupts.s kernel/kernel.c kernel/kernel.s
-KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_SRC))
+KERNEL_C_SRC := kernel/interrupts.c kernel/interrupts.s kernel/kernel.c kernel/kernel.s
+KERNEL_KOTLIN_SRC := kernel/hello.kt
+KERNEL_OBJS := $(patsubst %,$(O)/%.o,$(KERNEL_C_SRC))
 
 $(O)/kernel.bin: $(O)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib.a
-	$(LD) $(LDFLAGS) -o $@ $^
+$(O)/kernel.elf: kernel/kernel.ld $(KERNEL_OBJS) $(O)/libstdlib.a $(O)/libkernelkt.a
+	$(CXX) $(CXXFLAGS) -fuse-ld=lld -o $@ $^
 
+$(O)/libkernelkt.a $(O)/kernelkt_api.h: $(O)/kernelkt.stamp
+## Recover from the removal of $@
+	@test -f $@ || rm -f $<
+	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $<
+
+$(O)/kernelkt.stamp: $(KERNEL_KOTLIN_SRC) | $(O)/
+	@rm -f $@.tmp
+	@touch $@.tmp
+	$(KOTLINC) $(KOTLINC_FLAGS) -o $(O)/kernelkt $^
+	@mv -f $@.tmp $@
+
+# put the kotlin header in generated/ directory
+$(GEN)/kernelkt_api.h: $(O)/kernelkt_api.h | $(GEN)/
+	@cp $< $@
+
+$(O)/kernel/kernel.c.o: $(GEN)/kernelkt_api.h
 
 ###############################
 ### SECOND STAGE BOOTLOADER ###
@@ -92,6 +117,7 @@ run: $(O)/boot.bin
 
 clean:
 	$(RM) $(O)
+	$(RM) $(GEN)
 
 .PHONY: clean run
 
