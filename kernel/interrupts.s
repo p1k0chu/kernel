@@ -85,6 +85,7 @@ section .data
     %assign i i+1
     %endrep
 
+section .bss
     idtr:
     resb 10
     idt:
