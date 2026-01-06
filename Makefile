@@ -18,8 +18,10 @@ AR := llvm-ar
 QEMUC := qemu-system-$(ARCH)
 RM := rm -vrf
 
+INCLUDE_DIRS := ./include ./stdlib/include/
+
 CFLAGS := -Wall -Wextra -Werror -ffreestanding \
-   -Iinclude -target $(TARGET) -std=gnu23
+   -target $(TARGET) -std=gnu23 $(foreach dir,$(INCLUDE_DIRS), -I$(dir) )
 
 LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot
