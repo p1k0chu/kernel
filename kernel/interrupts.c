@@ -83,21 +83,24 @@ void exc_handler(int vector, struct pushad_frame *registers, struct interrupt_fr
     }
 
     const char msg_registers[] = "Registers:";
-    const char reg_names[][3]  = {"r15",
-                                  "r14",
-                                  "r13",
-                                  "r12",
-                                  "r11",
-                                  "r10",
-                                  "r9 ",
-                                  "r8 ",
-                                  "rdi",
-                                  "rsi",
-                                  "rbp",
-                                  "rbx",
-                                  "rdx",
-                                  "rcx",
-                                  "rax"};
+
+    const char reg_names[][3] __attribute__((nonstring)) = {
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r11",
+        "r10",
+        "r9 ",
+        "r8 ",
+        "rdi",
+        "rsi",
+        "rbp",
+        "rbx",
+        "rdx",
+        "rcx",
+        "rax",
+    };
 
     vga = (uint16_t *)0xB8000 + 44 + 80;
     printstr(vga, msg_registers, sizeof(msg_registers) - 1, WHITE | BLUE_BG);
