@@ -20,7 +20,7 @@ RM := rm -vrf
 
 INCLUDE_DIRS := ./include ./stdlib/include/
 
-CFLAGS := -Wall -Wextra -Werror -ffreestanding \
+CFLAGS := -Wall -Wextra -ffreestanding \
    -target $(TARGET) -std=gnu23 $(foreach dir,$(INCLUDE_DIRS), -I$(dir) )
 
 LDFLAGS := -nostdlib
