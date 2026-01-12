@@ -1,7 +1,8 @@
 #include "kernel.h"
 
 #include <stdint.h>
-#include <string.h>
+#include <my_stdio.h>
+#include <my_stdlib.h>
 
 void kernel_main() {
     uint16_t *vga = (void *)0xB8000;

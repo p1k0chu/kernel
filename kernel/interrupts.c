@@ -4,7 +4,6 @@
 
 #include <my_stdio.h>
 #include <my_stdlib.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <vga_color.h>
 
@@ -68,7 +67,7 @@ void exc_handler(int vector, struct pushad_frame *registers, struct interrupt_fr
 
     uint64_t *rsp        = (void *)interrupts->rsp;
     uint64_t  stack_top  = (uint64_t)get_stack_top();
-    uint32_t  stack_size = (stack_top - (uint64_t)rsp) / sizeof(size_t);
+    uint32_t  stack_size = (stack_top - (uint64_t)rsp) / sizeof(long);
 
     if (stack_size > STACK_DUMP_ROWS * STACK_DUMP_COLUMNS) {
         stack_size = STACK_DUMP_ROWS * STACK_DUMP_COLUMNS;
