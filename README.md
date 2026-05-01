@@ -22,4 +22,4 @@ works on my machine btw.
 ## License
 
 This project is licensed under MIT license  
-Copyright (c) 2025 p1k0chu
+Copyright (c) 2025, 2026 p1k0chu
