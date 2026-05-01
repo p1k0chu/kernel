@@ -21,7 +21,7 @@ RM := rm -vrf
 INCLUDE_DIRS := ./include ./stdlib/include/
 
 CFLAGS := -Wall -Wextra -ffreestanding \
-   -target $(TARGET) -std=gnu23 $(foreach dir,$(INCLUDE_DIRS), -I$(dir) )
+	-target $(TARGET) -std=gnu23 $(foreach dir,$(INCLUDE_DIRS), -I$(dir) )
 
 LDFLAGS := -nostdlib
 QEMUFLAGS := -no-reboot
@@ -119,5 +119,3 @@ $(O)/%.c.o32: %.c | $$(dir $$@)
 
 $(O)/%.s.o32: %.s | $$(dir $$@)
 	$(ASMC) -f elf32 -o $@ $<
-
-
